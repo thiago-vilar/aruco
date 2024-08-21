@@ -2,11 +2,16 @@ import cv2
 from object_detector import *
 import numpy as np
 #Load Aruco detector
-parameters = cv2.aruco.DetectorParameters
+parameters = cv2.aruco.DetectorParameters()
 aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_5X5_50)
 
 #Load detector
 detector = HomogeneousBgDetector()
+
+cap = cv2.VideoCapture(0)
+
+_, img = cap.read()
+
 #Load_image
 img = cv2.imread("phone_aruco.jpg")
 
@@ -18,11 +23,21 @@ int_corners= np.int0(corners)
 # print(int_corners)
 cv2.polylines(img, int_corners, True, (0,255, 0), 5)
 
+aruco_perimeter = cv2.arcLength(corners[0], True)
+
+#Pixel to CM ratio
+
+pixel_cm_ratio = aruco_perimeter /20
+
 contours = detector.detect_objects(img)
 for cnt in contours:
     #Get rect
     rect = cv2.minAreaRect(cnt)
     (x,y), (w,h), angle = rect
+
+    #Get width and height
+    object_width = w /pixel_cm_ratio
+    object_height = h / pixel_cm_ratio
 
    
     #Display rectangle
